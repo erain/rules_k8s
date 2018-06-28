@@ -17,12 +17,15 @@ addons:
       - kubectl
 
 before_install:
-  # Log into GCR
-  - echo "${GOOGLE_JSON_KEY}" | docker login -u _json_key --password-stdin https://us.gcr.io
-  # Log into gcloud
+  # Create the keyfile
   - echo -n "${GOOGLE_JSON_KEY}" > keyfile.json
+  # Log into GCR
+  - cat keyfile.json | docker login -u _json_key --password-stdin https://us.gcr.io
+  # Log into gcloud
   - gcloud auth activate-service-account --key-file keyfile.json
+  # Delete the keyfile
   - rm -f keyfile.json
+  # Set gcloud properties
   - gcloud config set core/project rules-k8s
   - gcloud config set compute/zone us-central1-f
   - gcloud container clusters get-credentials testing
